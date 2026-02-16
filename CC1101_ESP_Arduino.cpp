@@ -313,3 +313,15 @@ uint8_t CC1101::getVersion(){
 uint8_t CC1101::log2(double value){
 	return log10(value) / log10(2);
 }
+int8_t CC1101::getRSSI(){
+    uint8_t rssi_dec = spiReadStatus(CC1101_RSSI);
+    int8_t rssi_dbm;
+    
+    if (rssi_dec >= 128) {
+        rssi_dbm = ((int16_t)rssi_dec - 256) / 2 - 74;
+    } else {
+        rssi_dbm = (int16_t)rssi_dec / 2 - 74;
+    }
+    
+    return rssi_dbm;
+}
