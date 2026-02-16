@@ -107,6 +107,7 @@ void setModulation(MOD_FORMAT mod);
 void setDeviationHZ(int deviation_hz); //1586hz - 380859hz
 uint8_t getPartnum();
 uint8_t getVersion();
+int8_t getRSSI();
 ```
 
 ### Low level methods:
