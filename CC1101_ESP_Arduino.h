@@ -214,6 +214,7 @@ class CC1101 {
 		void setDeviationHZ(int deviation_hz); //1586hz - 380859hz
 		uint8_t getPartnum();
 		uint8_t getVersion();
+		int8_t getRSSI();
 		
 		void spiStrobe(uint8_t strobe);
 		uint8_t spiReadReg(uint8_t addr);
