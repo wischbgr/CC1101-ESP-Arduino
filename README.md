@@ -99,6 +99,7 @@ If no `spiInstance` is provided, the library defaults to `&SPI` and behaves exac
 ```cpp
 CC1101(int sck, int miso, int mosi, int cs, int gdo0);
 CC1101(int sck, int miso, int mosi, int cs, int gdo0, int gdo2);
+CC1101(int sck, int miso, int mosi, int cs, int gdo0, int gdo2, SPIClass *spiInstance);
 ```
 
 ### High level methods:
