@@ -81,12 +81,25 @@ In other words, you can't use the more flexible serial mode.
 
 * You can also use the GDOx pins for something else. Again, that's what the low level SPI methods are for.
 
+### Using a custom SPI bus instance
+Some boards have peripherals permanently wired to the default SPI bus, leaving it unavailable for the CC1101.
+A good example is the [Waveshare ESP32-S3-ETH](https://www.waveshare.com/wiki/ESP32-S3-ETH), which has an onboard W5500 Ethernet chip connected to the default SPI bus.
+
+In such cases, pass a secondary SPI instance to the constructor:
+```cpp
+SPIClass hspi(HSPI);
+CC1101 cc1101(CC1101_SCK, CC1101_MISO, CC1101_MOSI, CC1101_CS, CC1101_GDO0, -1, &hspi);
+```
+
+If no `spiInstance` is provided, the library defaults to `&SPI` and behaves exactly as before.
+
 ## API
 
 ### Constructors:
 ```cpp
 CC1101(int sck, int miso, int mosi, int cs, int gdo0);
 CC1101(int sck, int miso, int mosi, int cs, int gdo0, int gdo2);
+CC1101(int sck, int miso, int mosi, int cs, int gdo0, int gdo2, SPIClass *spiInstance);
 ```
 
 ### High level methods:

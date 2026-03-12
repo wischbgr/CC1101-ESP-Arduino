@@ -193,10 +193,11 @@ class CC1101 {
 		int8_t GDO0; //TX or TX/RX
 		int8_t GDO2; //RX
 		
+		SPIClass *_spi;
 		SPISettings spiSettings = SPISettings(10000000, MSBFIRST, SPI_MODE0);
 
 	public:
-		CC1101(int8_t sck, int8_t miso, int8_t mosi, int8_t cs, int8_t gdo0, int8_t gdo2=-1);
+		CC1101(int8_t sck, int8_t miso, int8_t mosi, int8_t cs, int8_t gdo0, int8_t gdo2=-1, SPIClass *spiInstance=&SPI);
 		
 		void init();
 		void softReset();

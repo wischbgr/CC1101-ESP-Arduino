@@ -18,13 +18,14 @@
 
 /****************************************************************/
 
-CC1101::CC1101(int8_t sck, int8_t miso, int8_t mosi, int8_t cs, int8_t gdo0, int8_t gdo2){
+CC1101::CC1101(int8_t sck, int8_t miso, int8_t mosi, int8_t cs, int8_t gdo0, int8_t gdo2, SPIClass *spiInstance){
 	SCK_PIN = sck;
 	MISO_PIN = miso;
 	MOSI_PIN = mosi;
 	SS_PIN = cs;
 	GDO0 = gdo0;
 	GDO2 = gdo2;
+	_spi = spiInstance;
 }
 
 void CC1101::spiStart(){
@@ -41,18 +42,18 @@ void CC1101::spiStart(){
 	}
 
 	#if defined ESP32
-	SPI.begin(SCK_PIN, MISO_PIN, MOSI_PIN, SS_PIN);
+	_spi->begin(SCK_PIN, MISO_PIN, MOSI_PIN, SS_PIN);
 	#else
-	SPI.begin();
+	_spi->begin();
 	#endif
 }
 
 void CC1101::spiEnd(){
-	SPI.end();
+	_spi->end();
 }
 
 void CC1101::spiStartTransaction(){
-	SPI.beginTransaction(spiSettings);
+	_spi->beginTransaction(spiSettings);
 	digitalWrite(SS_PIN, LOW);
 	while(digitalRead(MISO_PIN)){
 	 	yield();
@@ -60,17 +61,14 @@ void CC1101::spiStartTransaction(){
 }
 
 void CC1101::spiEndTransaction(){
-	//while(digitalRead(MISO_PIN)){
-	//	yield();
-	//};
 	delay(1);
 	digitalWrite(SS_PIN, HIGH);
-	SPI.endTransaction();
+	_spi->endTransaction();
 }
 
 void CC1101::spiStrobe(uint8_t strobe){
 	spiStartTransaction();
-	SPI.transfer(strobe);
+	_spi->transfer(strobe);
 	spiEndTransaction();
 }
 
@@ -78,8 +76,8 @@ uint8_t CC1101::spiReadReg(uint8_t addr){
 	uint8_t temp, value;
 	temp = addr| READ_SINGLE;
 	spiStartTransaction();
-	SPI.transfer(temp);
-	value=SPI.transfer(0);
+	_spi->transfer(temp);
+	value=_spi->transfer(0);
 	spiEndTransaction();
 	return value;
 }
@@ -88,8 +86,8 @@ uint8_t CC1101::spiReadStatus(uint8_t addr){
 	uint8_t value,temp;
 	temp = addr | READ_BURST;
 	spiStartTransaction();
-	SPI.transfer(temp);
-	value=SPI.transfer(0);
+	_spi->transfer(temp);
+	value=_spi->transfer(0);
 	spiEndTransaction();
 	return value;
 }
@@ -98,17 +96,17 @@ void CC1101::spiReadRegBurst(uint8_t addr, uint8_t *buffer, uint8_t buffer_len){
 	uint8_t temp;
 	temp = addr | READ_BURST;
 	spiStartTransaction();
-	SPI.transfer(temp);
+	_spi->transfer(temp);
 	for(uint8_t i = 0; i < buffer_len; i++){
-		buffer[i]=SPI.transfer(0);
+		buffer[i]=_spi->transfer(0);
 	}
 	spiEndTransaction();
 }
 
 void CC1101::spiWriteReg(uint8_t addr, uint8_t value){
 	spiStartTransaction();
-	SPI.transfer(addr);
-	SPI.transfer(value);
+	_spi->transfer(addr);
+	_spi->transfer(value);
 	spiEndTransaction();
 }
 
@@ -116,9 +114,9 @@ void CC1101::spiWriteRegBurst(uint8_t addr, const uint8_t *buffer, uint8_t buffe
 	uint8_t temp;
 	temp = addr | WRITE_BURST;
 	spiStartTransaction();
-	SPI.transfer(temp);
+	_spi->transfer(temp);
 	for (uint8_t i = 0; i < buffer_len; i++) {
-		SPI.transfer(buffer[i]);
+		_spi->transfer(buffer[i]);
 	}
 	spiEndTransaction();
 }
@@ -176,7 +174,7 @@ void CC1101::hardReset(){
 	digitalWrite(SS_PIN, HIGH);
 	delay(1);
 	spiStartTransaction();
-	SPI.transfer(CC1101_SRES);
+	_spi->transfer(CC1101_SRES);
 	spiEndTransaction();
 	spiStrobe(CC1101_SCAL);
 }
